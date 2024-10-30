@@ -2,71 +2,51 @@ import {
   Button,
   Container,
   createStyles,
-  Group,
-  List,
   Text,
-  ThemeIcon,
   Title,
 } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { TbCheck } from "react-icons/tb";
-import { FormattedMessage } from "react-intl";
-import Logo from "../components/Logo";
+import { useEffect } from "react";
 import Meta from "../components/Meta";
 import useUser from "../hooks/user.hook";
-import useConfig from "../hooks/config.hook";
 
 const useStyles = createStyles((theme) => ({
-  inner: {
+  container: {
+    height: "100vh",
     display: "flex",
-    justifyContent: "space-between",
-    paddingTop: `calc(${theme.spacing.md} * 4)`,
-    paddingBottom: `calc(${theme.spacing.md} * 4)`,
+    alignItems: "center",
+    justifyContent: "center",
+    background: theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0],
   },
 
   content: {
-    maxWidth: 480,
-    marginRight: `calc(${theme.spacing.md} * 3)`,
-
-    [theme.fn.smallerThan("md")]: {
-      maxWidth: "100%",
-      marginRight: 0,
-    },
+    textAlign: "center",
+    padding: theme.spacing.xl,
+    borderRadius: theme.radius.md,
+    background: theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
+    boxShadow: theme.shadows.sm,
   },
 
   title: {
+    fontFamily: theme.fontFamily,
+    fontSize: 28,
+    fontWeight: 600,
     color: theme.colorScheme === "dark" ? theme.white : theme.black,
-    fontSize: 44,
-    lineHeight: 1.2,
-    fontWeight: 900,
+    marginBottom: theme.spacing.md,
 
-    [theme.fn.smallerThan("xs")]: {
-      fontSize: 28,
+    [theme.fn.smallerThan("sm")]: {
+      fontSize: 24,
     },
   },
 
-  control: {
-    [theme.fn.smallerThan("xs")]: {
-      flex: 1,
-    },
+  text: {
+    color: theme.colorScheme === "dark" ? theme.colors.dark[2] : theme.colors.gray[6],
+    marginBottom: theme.spacing.xl,
   },
 
-  image: {
-    [theme.fn.smallerThan("md")]: {
-      display: "none",
-    },
-  },
-
-  highlight: {
-    position: "relative",
-    backgroundColor:
-      theme.colorScheme === "dark"
-        ? theme.fn.rgba(theme.colors[theme.primaryColor][6], 0.55)
-        : theme.colors[theme.primaryColor][0],
-    borderRadius: theme.radius.sm,
-    padding: "4px 12px",
+  button: {
+    marginTop: theme.spacing.md,
   },
 }));
 
@@ -74,114 +54,41 @@ export default function Home() {
   const { classes } = useStyles();
   const { refreshUser } = useUser();
   const router = useRouter();
-  const config = useConfig();
-  const [signupEnabled, setSignupEnabled] = useState(true);
 
-  // If user is already authenticated, redirect to the upload page
   useEffect(() => {
     refreshUser().then((user) => {
       if (user) {
         router.replace("/upload");
       }
     });
-
-    // If registration is disabled, get started button should redirect to the sign in page
-    try {
-      const allowRegistration = config.get("share.allowRegistration");
-      setSignupEnabled(allowRegistration !== false);
-    } catch (error) {
-      setSignupEnabled(true);
-    }
-  }, [config]);
-
-  const getButtonHref = () => {
-    return signupEnabled ? "/auth/signUp" : "/auth/signIn";
-  };
+  }, []);
 
   return (
     <>
-      <Meta title="Home" />
-      <Container>
-        <div className={classes.inner}>
+      <Meta title="Vargr Share" />
+      <div className={classes.container}>
+        <Container size="sm">
           <div className={classes.content}>
             <Title className={classes.title}>
-              <FormattedMessage
-                id="home.title"
-                values={{
-                  h: (chunks) => (
-                    <span className={classes.highlight}>{chunks}</span>
-                  ),
-                }}
-              />
+              Vargr Share
             </Title>
-            <Text color="dimmed" mt="md">
-              <FormattedMessage id="home.description" />
+            <Text size="lg" className={classes.text}>
+              Personal file sharing system
             </Text>
-
-            <List
-              mt={30}
-              spacing="sm"
-              size="sm"
-              icon={
-                <ThemeIcon size={20} radius="xl">
-                  <TbCheck size={12} />
-                </ThemeIcon>
-              }
+            <Text size="sm" color="dimmed" mb="xl">
+              For access, contact vargr
+            </Text>
+            <Button
+              component={Link}
+              href="/auth/signIn"
+              size="md"
+              className={classes.button}
             >
-              <List.Item>
-                <div>
-                  <b>
-                    <FormattedMessage id="home.bullet.a.name" />
-                  </b>{" "}
-                  - <FormattedMessage id="home.bullet.a.description" />
-                </div>
-              </List.Item>
-              <List.Item>
-                <div>
-                  <b>
-                    <FormattedMessage id="home.bullet.b.name" />
-                  </b>{" "}
-                  - <FormattedMessage id="home.bullet.b.description" />
-                </div>
-              </List.Item>
-              <List.Item>
-                <div>
-                  <b>
-                    <FormattedMessage id="home.bullet.c.name" />
-                  </b>{" "}
-                  - <FormattedMessage id="home.bullet.c.description" />
-                </div>
-              </List.Item>
-            </List>
-
-            <Group mt={30}>
-              <Button
-                component={Link}
-                href={getButtonHref()}
-                radius="xl"
-                size="md"
-                className={classes.control}
-              >
-                <FormattedMessage id="home.button.start" />
-              </Button>
-              <Button
-                component={Link}
-                href="https://github.com/stonith404/pingvin-share"
-                target="_blank"
-                variant="default"
-                radius="xl"
-                size="md"
-                className={classes.control}
-              >
-                <FormattedMessage id="home.button.source" />
-              </Button>
-            </Group>
+              Sign In
+            </Button>
           </div>
-          <Group className={classes.image} align="center">
-            <Logo width={200} height={200} />
-          </Group>
-        </div>
-      </Container>
+        </Container>
+      </div>
     </>
   );
 }
