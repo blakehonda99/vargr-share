@@ -1,9 +1,9 @@
 services:
   pingvin-share:
-    image: stonith404/pingvin-share
+    image: ghcr.io/blakehonda99/vargr-share
     restart: unless-stopped
     ports:
-      - 3000:3000
+      - 4300:4300
     environment:
       - TRUST_PROXY=false # Set to true if a reverse proxy is in front of the container
     volumes:
